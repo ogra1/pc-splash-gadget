@@ -22,4 +22,39 @@ parts:
       - grub-common
     plugin: make
     after: [grub-prepare]
-
+  psplash:
+    source: https://github.com/ogra1/psplash.git
+    plugin: make
+    prepare: |
+      export TREE="../../../psplash"
+      . ${TREE}/config
+      if ! $(echo "$FONT"|grep -q ^/); then \
+         FONT="${TREE}/${FONT}"; \
+      fi
+      if ! $(echo "$SPLASH"|grep -q ^/); then \
+         SPLASH="${TREE}/${SPLASH}"; \
+      fi
+      git apply ${TREE}/psplash.patch
+      ${TREE}/font-gen.sh "$FONT"
+      ./make-image-header.sh "$SPLASH" CORE psplash-core
+      aclocal
+      autoreconf --install
+      ./configure
+    install: |
+      rm -rf $SNAPCRAFT_PART_INSTALL/usr
+      cp -a ../../../psplash/initrd .
+      mkdir -p initrd/bin
+      cp psplash initrd/bin
+      cd initrd && find . | cpio --quiet -o -H newc| lzma >>$SNAPCRAFT_PART_INSTALL/psplash.img
+    build-packages:
+      - libgdk-pixbuf2.0-dev
+      - automake
+      - autoconf
+      - gcc
+      - otf2bdf
+      - libbogl-dev
+      - ttf-ubuntu-font-family
+      - cpio
+      - findutils
+      - xz-utils
+    after: [grub]

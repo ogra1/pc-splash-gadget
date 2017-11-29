@@ -26,3 +26,5 @@ volumes:
             target: EFI/boot/bootx64.efi
           - source: grub.cfg
             target: EFI/ubuntu/grub.cfg
+          - source: psplash.img
+            target: EFI/ubuntu/psplash.img
