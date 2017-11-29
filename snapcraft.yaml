@@ -26,7 +26,7 @@ parts:
     source: git://git.yoctoproject.org/psplash
     plugin: make
     prepare: |
-      export TREE="../../../psplash"
+      export TREE="../../../bootsplash"
       . ${TREE}/config
       if ! $(echo "$FONT"|grep -q ^/); then \
          FONT="${TREE}/${FONT}"; \
@@ -42,7 +42,7 @@ parts:
       ./configure
     install: |
       rm -rf $SNAPCRAFT_PART_INSTALL/usr
-      cp -a ../../../psplash/initrd .
+      cp -a ../../../bootsplash/initrd .
       mkdir -p initrd/bin
       cp psplash initrd/bin
       cd initrd && find . | cpio --quiet -o -H newc| lzma >>$SNAPCRAFT_PART_INSTALL/psplash.img
