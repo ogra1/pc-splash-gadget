@@ -4,6 +4,7 @@ type: gadget
 summary: PC gadget for generic devices
 description: |
     This gadget enables generic pc devices to work with Ubuntu Core
+    And ships a graphical boot splash by default
 grade: stable
 confinement: strict
 icon: icon.png
