@@ -5,6 +5,8 @@ summary: PC gadget for generic devices
 description: |
     This gadget enables generic pc devices to work with Ubuntu Core
     And ships a graphical boot splash by default
+
+base: core18
 grade: stable
 confinement: strict
 icon: icon.png
@@ -26,7 +28,7 @@ parts:
   psplash:
     source: git://git.yoctoproject.org/psplash
     plugin: make
-    prepare: |
+    override-build: |
       export TREE="../../../bootsplash"
       . ${TREE}/config
       if ! $(echo "$FONT"|grep -q ^/); then \
@@ -35,15 +37,15 @@ parts:
       if ! $(echo "$SPLASH"|grep -q ^/); then \
          SPLASH="${TREE}/${SPLASH}"; \
       fi
-      git apply ${TREE}/psplash.patch
+      git apply -v ${TREE}/psplash.patch
       ${TREE}/font-gen.sh "$FONT"
       ./make-image-header.sh "$SPLASH" CORE psplash-core
       aclocal
       autoreconf --install
       ./configure
-    install: |
+      snapcraftctl build
       rm -rf $SNAPCRAFT_PART_INSTALL/usr
-      cp -a ../../../bootsplash/initrd .
+      cp -a ${TREE}/initrd .
       mkdir -p initrd/bin
       cp psplash initrd/bin
       cd initrd && find . | cpio --quiet -o -H newc| lzma >>$SNAPCRAFT_PART_INSTALL/psplash.img
